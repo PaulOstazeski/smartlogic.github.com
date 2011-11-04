@@ -14,8 +14,13 @@ function loadStateFromHash() {
 		var article = (window.location.hash.indexOf('/') > 0) ?
 			window.location.hash.substring(0, window.location.hash.indexOf('/')) :
 			window.location.hash;
+    var team_member = article.split('_')[1];
+    article = article.split('_')[0];
 		if ($('article' + article)) {
 			showArticle(article);
+      if(team_member) {
+        clickTeamMember($('#team figure h3:contains(' + team_member + ')').parent());
+      }
 		}
 	} else {
 		showArticle('#about');
@@ -105,6 +110,23 @@ function showNextPortfolioImage(portfolioItem) {
 	showNavButtons(figure);
 }
 
+function sortTeamMembers() {
+  var sortedTeam = _.sortBy($('#team figure'), function(item) {
+    var name = $(item).find('h3').text().split(' ')[1].toUpperCase();
+    return name;
+  });
+  $('#team figure').detach();
+  _.each(sortedTeam, function(item) {
+    $('#team').append(item);
+  });
+}
+
+function clickTeamMember(member) {
+  sortTeamMembers();
+  $(member).detach();
+  $('#team h2').after(member);
+}
+
 $(document).ready(function() {
 	
 	// load initial state
@@ -117,6 +139,10 @@ $(document).ready(function() {
 	$('body > nav > a').click(function() {
 		showArticle($(this).attr('href'));
 	});
+
+  $('#team figure').live('click', function() {
+    clickTeamMember(this);
+  });
 	
 	// TODO: choose a better selector here
 	$('#portfolio aside a:first-child, #portfolio a:first-child').click(function(e) {
